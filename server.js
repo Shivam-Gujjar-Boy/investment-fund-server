@@ -70,5 +70,7 @@ const programId = new PublicKey(process.env.PROGRAM_ID);
 // Routes
 const activityRoutes = require('./routes/activityRoutes');
 const fundRoutes = require('./routes/fundRoutes');
+const govSymbolRoutes = require('./routes/govSymbolRoutes');
 app.use('/api/activity', activityRoutes);
 app.use('/api/funds/', fundRoutes);
+app.use('/api/govSymbol', govSymbolRoutes);
