@@ -1,5 +1,18 @@
 const GovSymbol = require("../models/GovSymbol");
 
+exports.addGovSymbol = async (req, res) => {
+  const { govSymbol } = req.body;
+  try {
+    const govSymboll = new GovSymbol({
+      govSymbol,
+    });
+    await govSymboll.save();
+    res.status(201).json(govSymboll);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error adding gov symbol' });
+  }
+};
+
 exports.checkGovBySymbol = async (req, res) => {
     const govSymbol = req.params.govSymbol;
     try {
