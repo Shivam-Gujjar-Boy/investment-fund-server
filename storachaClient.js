@@ -9,20 +9,21 @@ async function initStorachaClient() {
 
     client = await create();
     const account = await client.login(process.env.STORACHA_EMAIL);
+    await account.plan.wait();
     const spaceDID = process.env.PEERFUNDS_SPACE_DID;
 
     if (!spaceDID) {
         throw new Error('Missing space DID in environment');
     }
 
-    // const SPACE_NAME = 'PeerFunds';
-    space = await client.getSpace(spaceDID);
-    if (!space) throw new Error('Failed to get space. DID may be invalid.')
-    // if (!space) {
-    //     space = await client.createSpace(SPACE_NAME, {account});
-    // }
-
-    await client.setCurrentSpace(space);
+    // const SPACE_NAME = 'Peerfunds';
+    space = client.currentSpace();
+    if (!space) {
+        throw new Error('Failed to get space. DID may be invalid.');
+    }
+    if (space.did() !== `did:key:${process.env.PEERFUNDS_SPACE_DID}`) {
+        throw new Error('DID is wrong');
+    }
 
     return {client, space};
 }

@@ -6,6 +6,8 @@ const cors = require('cors');
 const {Server} = require('socket.io');
 const connectDB = require('./config/database');
 const parseLog = require('./parseLog');
+const parseError = require('./parseError');
+const parseUserError = require('./parseUserError');
 const FundLogs = require('./models/FundLogs');
 
 dotenv.config();
@@ -29,6 +31,8 @@ const programId = new PublicKey(process.env.PROGRAM_ID);
     connection.onLogs(programId, async (loginfo) => {
         const logs = loginfo.logs;
         const fundLogs = logs.filter((log) => log.includes('[FUND-ACTIVITY]'));
+        const fundErrors = logs.filter((log) => log.includes('[FUND-ERROR]'));
+        const userErrors = logs.filter((log) => log.includes('[USER-ERROR]'));
 
         for (const log of fundLogs) {
             const parsed = parseLog(log);
@@ -57,6 +61,51 @@ const programId = new PublicKey(process.env.PROGRAM_ID);
                 });
 
                 console.log('Logged activity:', fund, logMessage);
+            } catch (err) {
+                console.error('Failed to store activity log:', err);
+            }
+        }
+
+        for (const error of fundErrors) {
+            const parsed = parseError(error);
+            if (!parsed) {
+                continue;
+            }
+
+            const {fund, user, errorMessage} = parsed;
+            const newEntry = {errorMessage};
+
+            try {
+                console.log('emit hone wala hai error');
+                io.emit('fund_error', {
+                    fund,
+                    user,
+                    ...newEntry,
+                });
+
+                console.log('Logged error:', fund, errorMessage);
+            } catch (err) {
+                console.error('Failed to store activity log:', err);
+            }
+        }
+
+        for (const userError of userErrors) {
+            const parsed = parseUserError(error);
+            if (!parsed) {
+                continue;
+            }
+
+            const {user, errorMessage} = parsed;
+            const newEntry = {errorMessage};
+
+            try {
+                console.log('emit hone wala hai user error');
+                io.emit('user_error', {
+                    user,
+                    ...newEntry,
+                });
+
+                console.log('Logged error:', errorMessage);
             } catch (err) {
                 console.error('Failed to store activity log:', err);
             }
