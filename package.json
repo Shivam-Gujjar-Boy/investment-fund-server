@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@solana/web3.js": "^1.98.2",
+    "@web3-storage/w3up-client": "^17.3.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",

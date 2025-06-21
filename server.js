@@ -8,7 +8,6 @@ const connectDB = require('./config/database');
 const parseLog = require('./parseLog');
 const FundLogs = require('./models/FundLogs');
 
-
 dotenv.config();
 connectDB();
 
@@ -34,12 +33,10 @@ const programId = new PublicKey(process.env.PROGRAM_ID);
         for (const log of fundLogs) {
             const parsed = parseLog(log);
             if (!parsed) {
-                console.log('yaha aaya mai');
                 continue;
             }
 
-            console.log('yaha aaya mai 1');
-            const {fund, logMessage, timestamp} = parsed;
+            const {fund, fundName, logMessage, timestamp} = parsed;
             const signature = loginfo.signature;
 
             const newEntry = {logMessage, timestamp, signature};
@@ -47,6 +44,7 @@ const programId = new PublicKey(process.env.PROGRAM_ID);
             try {
                 await FundLogs.findOneAndUpdate(
                     {fund},
+                    {fundName},
                     {$push: {logs: newEntry}},
                     {upsert: true, new: true}
                 );
@@ -54,6 +52,7 @@ const programId = new PublicKey(process.env.PROGRAM_ID);
                 console.log('emit hone wala hai log');
                 io.emit('fund_activity', {
                     fund,
+                    fundName,
                     ...newEntry,
                 });
 
@@ -71,6 +70,8 @@ const programId = new PublicKey(process.env.PROGRAM_ID);
 const activityRoutes = require('./routes/activityRoutes');
 const fundRoutes = require('./routes/fundRoutes');
 const govSymbolRoutes = require('./routes/govSymbolRoutes');
+const uploadProposal = require('./routes/uploadProposal');
 app.use('/api/activity', activityRoutes);
 app.use('/api/funds/', fundRoutes);
 app.use('/api/govSymbol', govSymbolRoutes);
+app.use('/api', uploadProposal);
