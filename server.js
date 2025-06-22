@@ -125,4 +125,4 @@ app.use('/api/activity', activityRoutes);
 app.use('/api/funds/', fundRoutes);
 app.use('/api/govSymbol', govSymbolRoutes);
 app.use('/api', uploadProposal);
-app.use('/api', uploadUserData);
+app.use('/api/upload', uploadUserData);

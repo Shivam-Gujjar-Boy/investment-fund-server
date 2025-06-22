@@ -34,7 +34,7 @@ router.post('/upload-user-data', upload.single('image'), async (req, res) => {
     const metadata = {
       username: username.trim(),
       email: email.trim(),
-      image: fileBuffer ? 'profile.jpg' : null, // relative path inside folder
+      image: fileBuffer ? 'profile.jpg' : null,
     };
 
     const metadataBlob = new Blob([JSON.stringify(metadata)], {
@@ -45,14 +45,24 @@ router.post('/upload-user-data', upload.single('image'), async (req, res) => {
 
     // Upload the directory to IPFS
     const dirCidObject = await client.uploadDirectory(files);
-    const cidBuffer = dirCidObject['/'];
-    const dirCid = bs58.encode(cidBuffer);
+
+    const cidObject = JSON.stringify(dirCidObject, null, 2);
+    console.log(cidObject.length);
+    let dirCid = '';
+    for (let i=10; i<cidObject.length; i++) {
+        if (cidObject[i] !== `"`) {
+            dirCid += cidObject[i];
+        } else {
+            break;
+        }
+    }
 
     res.status(200).json({
       success: true,
+      cidObject: dirCidObject,
       folderCid: dirCid,
-      metadataUrl: `https://${dirCid}.ipfs.dweb.link/metadata.json`,
-      imageUrl: fileBuffer ? `https://${dirCid}.ipfs.dweb.link/profile.jpg` : null,
+      metadataUrl: `https://${dirCid}.ipfs.w3s.link/metadata.json`,
+      imageUrl: fileBuffer ? `https://${dirCid}.ipfs.w3s.link/profile.jpg` : null,
     });
   } catch (err) {
     console.error('Error uploading directory to Storacha:', err);
