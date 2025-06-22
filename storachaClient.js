@@ -16,6 +16,8 @@ async function initStorachaClient() {
         throw new Error('Missing space DID in environment');
     }
 
+    await client.setCurrentSpace(`did:key:${spaceDID}`);
+
     // const SPACE_NAME = 'Peerfunds';
     space = client.currentSpace();
     if (!space) {
