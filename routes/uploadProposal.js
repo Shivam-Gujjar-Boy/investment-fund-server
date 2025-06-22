@@ -33,8 +33,6 @@ router.post('/upload-proposal', async (req, res) => {
 
         const file = new File([blob], filename);
         const cidObject = await client.uploadFile(file);
-        console.log(typeof cidObject);
-        console.log("cid:", cidObject['/']);
         const cidBuffer = cidObject['/'];
         const cidStr = bs58.encode(cidBuffer);
         console.log("hash:", hash);
